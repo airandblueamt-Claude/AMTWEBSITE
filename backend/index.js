@@ -253,6 +253,25 @@ app.post("/api/lead", rateLimit(10, 60_000), async (req, res) => {
   }
 });
 
+// Same-origin Sanity read proxy (mirrors api/sanity.js for local dev via the Vite proxy).
+app.post("/api/sanity", async (req, res) => {
+  const { query, params } = req.body || {};
+  if (!query || typeof query !== "string") return res.status(400).json({ result: null });
+  const u = new URL("https://lgtz8nod.apicdn.sanity.io/v2024-01-01/data/query/production");
+  u.searchParams.set("query", query);
+  if (params && typeof params === "object") {
+    for (const [k, v] of Object.entries(params)) u.searchParams.set("$" + k, JSON.stringify(v));
+  }
+  try {
+    const r = await fetch(u.toString());
+    if (!r.ok) return res.status(502).json({ result: null });
+    const data = await r.json();
+    return res.json({ result: data.result ?? null });
+  } catch (e) {
+    return res.status(502).json({ result: null, error: String(e) });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`AMT backend on :${PORT} | AI: ${AI_ON ? PROVIDER + " " + MODEL : "offline grounded responder"} | mail: ${mailer ? "on" : "off (WhatsApp handoff)"}`);
 });
