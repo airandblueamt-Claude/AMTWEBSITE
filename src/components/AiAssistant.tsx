@@ -99,6 +99,15 @@ const AiAssistant: React.FC = () => {
   async function submitLead(e: React.FormEvent) {
     e.preventDefault();
     if (sending) return;
+    // Build the WhatsApp link client-side and open it NOW, inside the click gesture —
+    // doing it after the await would get popup-blocked. This is the real delivery path.
+    const waText =
+      lang === "ar"
+        ? `استفسار جديد من ${lead.name} (${lead.contact}):\n${lead.message}`
+        : `New inquiry from ${lead.name} (${lead.contact}):\n${lead.message}`;
+    const waUrl = `${WHATSAPP}?text=${encodeURIComponent(waText)}`;
+    window.open(waUrl, "_blank", "noopener,noreferrer");
+
     setSending(true);
     try {
       const res = await fetch(LEAD, {
@@ -107,13 +116,15 @@ const AiAssistant: React.FC = () => {
       });
       const data = await res.json();
       setMsgs((m) => [...m, { role: "bot", text: data.reply || c.err }]);
-      if (data.whatsapp) setAction({ label: c.onWhatsApp, href: data.whatsapp });
-      setFormOpen(false);
-      setLead({ name: "", contact: "", message: "" });
+      setAction({ label: c.onWhatsApp, href: data.whatsapp || waUrl });
     } catch {
       setMsgs((m) => [...m, { role: "bot", text: c.err }]);
-      setAction({ label: c.onWhatsApp, href: WHATSAPP });
-    } finally { setSending(false); }
+      setAction({ label: c.onWhatsApp, href: waUrl });
+    } finally {
+      setSending(false);
+      setFormOpen(false);
+      setLead({ name: "", contact: "", message: "" });
+    }
   }
 
   const onQuick = (q: string) => (q === c.inquiry ? (setFormOpen(true), setQuick([])) : send(q));

@@ -218,6 +218,7 @@ app.post("/api/lead", rateLimit(10, 60_000), async (req, res) => {
       return res.status(400).json({ ok: false, reply: L("Please fill in your name, contact and message.", "يرجى تعبئة الاسم ووسيلة التواصل والرسالة.", lang) });
 
     const summary = `New website inquiry\n\nName: ${name}\nContact: ${contact}\n\nMessage:\n${message}`;
+    let emailed = false;
     if (mailer) {
       try {
         await mailer.sendMail({
@@ -227,21 +228,26 @@ app.post("/api/lead", rateLimit(10, 60_000), async (req, res) => {
           subject: `AMT website inquiry — ${name}`,
           text: summary,
         });
+        emailed = true;
       } catch (e) { console.warn("lead email failed:", e.message); }
     } else {
       console.log("LEAD (no SMTP configured):\n" + summary);
     }
-    // Always hand back a prefilled WhatsApp link so the customer can also send it instantly.
+    // Prefilled WhatsApp link so the inquiry actually reaches AMT in one tap.
     const whatsapp = WA + "?text=" + encodeURIComponent(summary);
-    return res.json({
-      ok: true,
-      whatsapp,
-      reply: L(
-        `Thanks ${name}! ✅ Your inquiry has been sent to our team — we'll reach out at ${contact} shortly. You can also send it directly on WhatsApp below.`,
-        `شكرًا ${name}! ✅ تم إرسال استفسارك إلى فريقنا — سنتواصل معك عبر ${contact} قريبًا. يمكنك أيضًا إرساله مباشرة عبر واتساب بالأسفل.`,
-        lang
-      ),
-    });
+    // Honest confirmation: only claim it was emailed when SMTP actually sent it.
+    const reply = emailed
+      ? L(
+          `Thanks ${name}! ✅ Your inquiry was emailed to our team — we'll reach out at ${contact}. You can also send it on WhatsApp below.`,
+          `شكرًا ${name}! ✅ تم إرسال استفسارك إلى فريقنا عبر البريد — سنتواصل معك عبر ${contact}. يمكنك أيضًا إرساله عبر واتساب بالأسفل.`,
+          lang
+        )
+      : L(
+          `Thanks ${name}! I've opened WhatsApp with your inquiry pre-filled — just press send and it reaches our team. We'll reply at ${contact}.`,
+          `شكرًا ${name}! فتحت لك واتساب ورسالتك جاهزة — فقط اضغط إرسال لتصل إلى فريقنا. سنرد عليك عبر ${contact}.`,
+          lang
+        );
+    return res.json({ ok: true, emailed, whatsapp, reply });
   } catch {
     return res.status(500).json({ ok: false, reply: "Server error." });
   }

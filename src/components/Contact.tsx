@@ -53,21 +53,26 @@ const Contact: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (sending) return;
+    const name = formData.company || (lang === "ar" ? "زائر الموقع" : "Website contact");
+    const message = [
+      formData.subject && `Subject: ${formData.subject}`,
+      formData.budget && `Budget: ${formData.budget}`,
+      formData.message,
+    ].filter(Boolean).join("\n");
+    // Open WhatsApp (pre-filled) within the click gesture so it isn't popup-blocked —
+    // this is the channel that actually reaches the team.
+    const waText =
+      lang === "ar"
+        ? `استفسار جديد من ${name} (${formData.email}):\n${message}`
+        : `New inquiry from ${name} (${formData.email}):\n${message}`;
+    window.open(`https://wa.me/966554593722?text=${encodeURIComponent(waText)}`, "_blank", "noopener,noreferrer");
+
     setSending(true);
     try {
       await fetch("/api/lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: formData.company || (lang === "ar" ? "زائر الموقع" : "Website contact"),
-          contact: formData.email,
-          message: [
-            formData.subject && `Subject: ${formData.subject}`,
-            formData.budget && `Budget: ${formData.budget}`,
-            formData.message,
-          ].filter(Boolean).join("\n"),
-          lang,
-        }),
+        body: JSON.stringify({ name, contact: formData.email, message, lang }),
       });
     } catch {
       /* server logs + WhatsApp fallback still apply; show success either way */

@@ -34,7 +34,6 @@ export function OptimizedImage({
       alt={alt ?? ""}
       loading={priority ? "eager" : loading ?? "lazy"}
       decoding={decoding}
-      fetchPriority={priority ? "high" : undefined}
       src={normalizedSrc}
       {...rest}
     />
