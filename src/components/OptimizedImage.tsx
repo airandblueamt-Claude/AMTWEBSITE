@@ -1,9 +1,6 @@
 import type { ImgHTMLAttributes } from "react";
 
-export type OptimizedImageProps = Omit<
-  ImgHTMLAttributes<HTMLImageElement>,
-  "loading" | "decoding"
-> & {
+export type OptimizedImageProps = ImgHTMLAttributes<HTMLImageElement> & {
   /** When true, load eagerly and hint high fetch priority (hero / above-the-fold). */
   priority?: boolean;
 };

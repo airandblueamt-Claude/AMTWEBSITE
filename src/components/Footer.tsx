@@ -8,6 +8,7 @@ import { SOCIAL_LINKS } from "../seo/siteConfig";
 import Logo from "../assets/LOGOAMT.png";
 
 // 🔹 خريطة الأيقونات
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const iconMap: Record<string, any> = {
   linkedin: Linkedin,
   instagram: Instagram,
@@ -15,6 +16,7 @@ const iconMap: Record<string, any> = {
 };
 
 const Footer = () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [data, setData] = useState<any>(null);
   const { t, i18n } = useTranslation();
   const lang = i18n.language.startsWith("ar") ? "ar" : "en";
@@ -51,8 +53,8 @@ const Footer = () => {
 
   return (
     <footer
-      className="relative text-white"
-      style={{ backgroundColor: "#4C4D4E" }}
+      className="relative text-white border-t border-white/10"
+      style={{ backgroundColor: "#08081c" }}
     >
       <div className="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 lg:grid-cols-3 gap-12">
 
@@ -60,8 +62,8 @@ const Footer = () => {
         <div>
           <OptimizedImage
             src={Logo}
-            alt="AMT Advanced Micro Technologies wordmark logo on dark footer background"
-            className="w-56 h-auto"
+            alt="AMT Advanced Micro Technologies wordmark logo"
+            className="brightness-0 invert w-56 h-auto"
             width={224}
             height={80}
             loading="lazy"

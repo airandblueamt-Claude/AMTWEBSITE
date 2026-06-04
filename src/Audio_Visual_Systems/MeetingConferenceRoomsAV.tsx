@@ -5,7 +5,8 @@ import { useTranslation } from "react-i18next";
 
 const MeetingConferenceRoomsAV: React.FC = () => {
   const shouldReduceMotion = useReducedMotion();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language.startsWith("ar");
 
   const sections = [
     {
@@ -36,35 +37,55 @@ const MeetingConferenceRoomsAV: React.FC = () => {
   };
 
   return (
-    <main className="w-full bg-[#F7F7F7] text-[#1A1A1A]">
+    <main dir={isRTL ? "rtl" : "ltr"} className="w-full text-ink">
 
       {/* ===== PAGE HEADER ===== */}
-      <section className="py-24 px-6 text-center bg-white border-b">
-        <motion.h1
-          className="text-4xl md:text-5xl font-extrabold text-[#851A18] mb-6"
-          initial={shouldReduceMotion ? {} : "hidden"}
-          animate="visible"
-          variants={fadeUp}
-        >
-          {t("av.meetingRooms.title")}
-        </motion.h1>
+      <section className="relative py-24 md:py-28 px-6 md:px-12 text-center">
+        <div
+          className="absolute -top-24 left-1/2 -translate-x-1/2 w-[42rem] h-[42rem] rounded-full pointer-events-none"
+          aria-hidden="true"
+          style={{
+            background:
+              "radial-gradient(circle, rgba(214,19,43,.18), transparent 60%)",
+            filter: "blur(24px)",
+          }}
+        />
+        <div className="relative z-10 max-w-3xl mx-auto">
+          <motion.span
+            className="block text-eyebrow text-xs tracking-[0.2em] font-semibold uppercase mb-4"
+            initial={shouldReduceMotion ? {} : "hidden"}
+            animate="visible"
+            variants={fadeUp}
+          >
+            {t("nav.audioVisual", { defaultValue: "Audio Visual Systems" })}
+          </motion.span>
 
-        <motion.p
-          className="max-w-3xl mx-auto text-base md:text-lg text-[#555]"
-          initial={shouldReduceMotion ? {} : "hidden"}
-          animate="visible"
-          variants={fadeUp}
-        >
-          {t("av.meetingRooms.subtitle")}
-        </motion.p>
+          <motion.h1
+            className="font-display text-4xl md:text-5xl font-extrabold text-gradient mb-6"
+            initial={shouldReduceMotion ? {} : "hidden"}
+            animate="visible"
+            variants={fadeUp}
+          >
+            {t("av.meetingRooms.title")}
+          </motion.h1>
+
+          <motion.p
+            className="max-w-3xl mx-auto text-base md:text-lg text-copy leading-relaxed"
+            initial={shouldReduceMotion ? {} : "hidden"}
+            animate="visible"
+            variants={fadeUp}
+          >
+            {t("av.meetingRooms.subtitle")}
+          </motion.p>
+        </div>
       </section>
 
-      {/* ===== PREMIUM SOLUTIONS CARDS ===== */}
+      {/* ===== SOLUTIONS CARDS ===== */}
       <section
-        className="max-w-7xl mx-auto px-6 py-24"
+        className="max-w-7xl mx-auto px-6 md:px-12 py-20 md:py-28"
         aria-label="Meeting and conference room AV solutions"
       >
-        <div className="grid md:grid-cols-2 gap-10">
+        <div className="grid md:grid-cols-2 gap-8">
           {sections.map((sec, idx) => (
             <motion.article
               key={idx}
@@ -72,25 +93,22 @@ const MeetingConferenceRoomsAV: React.FC = () => {
               whileInView="visible"
               viewport={{ once: true, amount: 0.25 }}
               variants={fadeUp}
-              whileHover={
-                shouldReduceMotion
-                  ? {}
-                  : { y: -6 }
-              }
+              transition={{ delay: idx * 0.08 }}
+              whileHover={shouldReduceMotion ? {} : { y: -4 }}
               className="
-                group relative bg-white rounded-2xl p-8
-                border border-gray-200
-                shadow-[0_10px_25px_rgba(0,0,0,0.06)]
-                hover:shadow-[0_20px_40px_rgba(133,26,24,0.15)]
+                glass group relative rounded-2xl p-8
+                border border-hairline
                 transition-all duration-300
+                hover:border-[#d6132b]/40
+                hover:shadow-[0_20px_50px_-20px_rgba(214,19,43,0.5)]
                 overflow-hidden
               "
             >
               {/* Accent Line */}
               <span
                 className="
-                  absolute left-0 top-0 h-full w-1
-                  bg-gradient-to-b from-[#851A18] to-[#b43b38]
+                  absolute top-0 ltr:left-0 rtl:right-0 h-full w-1
+                  bg-gradient-to-b from-[#d6132b] to-[#f12942]
                 "
                 aria-hidden="true"
               />
@@ -99,7 +117,7 @@ const MeetingConferenceRoomsAV: React.FC = () => {
               <span
                 className="
                   absolute inset-0
-                  bg-gradient-to-br from-[#851A18]/5 to-transparent
+                  bg-gradient-to-br from-[#d6132b]/10 to-transparent
                   opacity-0 group-hover:opacity-100
                   transition-opacity duration-300
                 "
@@ -108,10 +126,10 @@ const MeetingConferenceRoomsAV: React.FC = () => {
 
               {/* Content */}
               <div className="relative z-10">
-                <h2 className="text-xl font-bold mb-4 text-[#851A18]">
+                <h2 className="text-xl font-bold mb-4 text-ink">
                   {sec.title}
                 </h2>
-                <p className="text-sm leading-relaxed text-[#444]">
+                <p className="text-sm leading-relaxed text-muted">
                   {sec.text}
                 </p>
               </div>

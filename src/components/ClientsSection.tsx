@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { motion } from "framer-motion";
 import { sanity } from "../sanityClient";
 import { useTranslation } from "react-i18next";
 import { localize } from "../utils/localize";
 import OptimizedImage from "./OptimizedImage";
+import ScrollRow from "./ScrollRow";
 
 const ClientsSection: React.FC = () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [data, setData] = useState<any>(null);
   const { i18n } = useTranslation();
   const lang = i18n.language.startsWith("ar") ? "ar" : "en";
+  const isRTL = lang === "ar";
 
   /* ================= FETCH ================= */
   useEffect(() => {
@@ -31,102 +33,66 @@ const ClientsSection: React.FC = () => {
       .catch(console.error);
   }, []);
 
-  /* ================= CLIENTS SLIDER ================= */
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const itemsPerPage = 3;
-
   const clients = data?.clients || [];
-  const totalPages = Math.ceil(clients.length / itemsPerPage);
-  const currentPage = Math.floor(currentIndex / itemsPerPage);
-
-  const nextClients = () =>
-    setCurrentIndex((prev) =>
-      prev + itemsPerPage >= clients.length ? 0 : prev + itemsPerPage
-    );
-
-  const prevClients = () =>
-    setCurrentIndex((prev) =>
-      prev === 0
-        ? Math.max(clients.length - itemsPerPage, 0)
-        : prev - itemsPerPage
-    );
-
-  useEffect(() => {
-    if (!clients.length) return;
-    const interval = setInterval(nextClients, 3000);
-    return () => clearInterval(interval);
-  }, [clients.length]);
 
   /* ================= GUARD ================= */
   if (!data || !clients.length) return null;
 
   /* ================= RENDER ================= */
   return (
-    <section className="flex flex-col items-center my-20 px-6 bg-white">
+    <section
+      dir={isRTL ? "rtl" : "ltr"}
+      className="py-20 md:py-28"
+    >
+      <div className="max-w-7xl mx-auto px-6 md:px-12">
 
-      {/* ===== TITLE ===== */}
-      <h2 className="text-3xl md:text-4xl font-bold mb-12 text-[#851A1A]">
-        {localize(data.title, lang)}
-      </h2>
-
-      {/* ===== CLIENT LOGOS ===== */}
-      <div className="w-full max-w-5xl flex justify-center relative overflow-hidden">
-
-        <button
-          onClick={prevClients}
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white p-2 rounded-full shadow"
+        {/* ===== HEADER ===== */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="flex flex-col items-center text-center mb-14 md:mb-16"
         >
-          <ChevronLeft size={32} />
-        </button>
+          <span className="text-eyebrow text-xs tracking-[0.2em] font-semibold uppercase mb-4">
+            {isRTL ? "موثوق بنا" : "Trusted By"}
+          </span>
+          <h2 className="text-3xl md:text-4xl font-bold text-gradient">
+            {localize(data.title, lang)}
+          </h2>
+          <p className="mt-4 max-w-2xl text-muted">
+            {isRTL
+              ? "نفخر بشراكتنا مع كبرى الجهات والمؤسسات الرائدة."
+              : "Proudly partnering with leading ministries, enterprises and institutions."}
+          </p>
+        </motion.div>
 
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentIndex}
-            initial={{ opacity: 0, x: 100 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -100 }}
-            transition={{ duration: 0.5 }}
-            className="flex justify-center gap-16"
-          >
-            {clients
-              .slice(currentIndex, currentIndex + itemsPerPage)
-              .map((client: any, idx: number) => (
-                <div
-                  key={idx}
-                  className="w-44 h-44 rounded-full bg-white shadow flex items-center justify-center"
-                >
-                  <OptimizedImage
-                    src={client.logo?.asset?.url}
-                    alt={`${localize(client.name, lang)} — client organization logo`}
-                    className="w-32 h-32 object-contain"
-                    width={128}
-                    height={128}
-                    loading="lazy"
-                  />
-                </div>
-              ))}
-          </motion.div>
-        </AnimatePresence>
+        {/* ===== CLIENT LOGOS ===== */}
+        <ScrollRow>
+          {clients
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .map((client: any, idx: number) => (
+              <div
+                key={idx}
+                className="group relative flex h-40 w-40 shrink-0 items-center justify-center rounded-2xl bg-white p-6 ring-1 ring-black/5 shadow-lg shadow-black/20 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_22px_50px_-18px_var(--glow)] hover:ring-2 hover:ring-[#d6132b]/50 sm:w-44"
+              >
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute -inset-2 rounded-3xl bg-[radial-gradient(circle_at_center,rgba(214,19,43,0.22),transparent_70%)] opacity-0 blur-md transition-opacity duration-300 group-hover:opacity-100"
+                />
+                <OptimizedImage
+                  src={client.logo?.asset?.url}
+                  alt={`${localize(client.name, lang)} — client organization logo`}
+                  className="relative h-28 w-28 object-contain transition-transform duration-300 group-hover:scale-105"
+                  width={128}
+                  height={128}
+                  loading="lazy"
+                />
+              </div>
+            ))}
+        </ScrollRow>
 
-        <button
-          onClick={nextClients}
-          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white p-2 rounded-full shadow"
-        >
-          <ChevronRight size={32} />
-        </button>
       </div>
-
-      {/* ===== PAGINATION DOTS ===== */}
-      <div className="flex mt-6 gap-2">
-        {Array.from({ length: totalPages }).map((_, idx) => (
-          <span
-            key={idx}
-            className={`w-3 h-3 rounded-full ${idx === currentPage ? "bg-gray-800" : "bg-gray-400"
-              }`}
-          />
-        ))}
-      </div>
-
     </section>
   );
 };

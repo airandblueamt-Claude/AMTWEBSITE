@@ -1,18 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { sanity, urlFor } from "../sanityClient";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import OptimizedImage from "../components/OptimizedImage";
 import { localize } from "../utils/localize";
 import { AppLocale, DEFAULT_LOCALE, isSupportedLocale, withLocale } from "../utils/localeRouting";
 
 const IpTelephony: React.FC = () => {
+  const shouldReduceMotion = useReducedMotion();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [data, setData] = useState<any>(null);
   const navigate = useNavigate();
   const { i18n } = useTranslation();
   const { locale } = useParams();
   const activeLocale: AppLocale = isSupportedLocale(locale) ? locale : DEFAULT_LOCALE;
   const lang = i18n.language.startsWith("ar") ? "ar" : "en";
+  const isRTL = lang === "ar";
 
   useEffect(() => {
     sanity
@@ -34,85 +38,113 @@ const IpTelephony: React.FC = () => {
   if (!data) return null;
 
   return (
-    <section className="w-full bg-[#f5f5f5] min-h-screen px-6 md:px-20 py-24 space-y-24">
+    <section dir={isRTL ? "rtl" : "ltr"} className="relative w-full">
 
       {/* HERO */}
-      <div
-        className="relative rounded-3xl overflow-hidden shadow-xl mb-12"
-        style={{
-          backgroundImage: `url(${urlFor(data.heroImage).width(1600).url()})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          height: "500px",
-        }}
-      >
-        <div className="absolute inset-0 bg-[#851A18]/70 flex items-center justify-center">
-          <motion.h1
-            initial={{ opacity: 0, y: -30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-5xl md:text-6xl font-extrabold text-white text-center px-6"
-          >
-            {localize(data.title, lang)}
-          </motion.h1>
+      <header className="relative">
+        <div className="relative h-[60vh] min-h-[420px] w-full overflow-hidden">
+          <OptimizedImage
+            src={urlFor(data.heroImage).width(1920).url()}
+            alt={`${localize(data.title, lang)} — IP telephony solutions`}
+            className="absolute inset-0 w-full h-full object-cover"
+            width={1920}
+            height={1080}
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#060616] via-[#060616]/60 to-[#060616]/40" />
+
+          <div className="absolute inset-0 flex items-end">
+            <div className="max-w-7xl mx-auto w-full px-6 md:px-12 pb-14 md:pb-20">
+              <motion.p
+                initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="text-[#ff8493] text-xs tracking-[0.2em] font-semibold uppercase mb-4"
+              >
+                {isRTL ? "هاتفية IP" : "IP Telephony"}
+              </motion.p>
+              <motion.h1
+                initial={shouldReduceMotion ? false : { opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.05 }}
+                className="text-4xl md:text-6xl font-bold leading-tight text-gradient max-w-4xl"
+              >
+                {localize(data.title, lang)}
+              </motion.h1>
+            </div>
+          </div>
         </div>
-      </div>
+      </header>
 
-      {/* INTRO */}
-      <div className="max-w-3xl mx-auto text-center space-y-4">
-        <motion.p
-          className="text-xl font-semibold text-[#851A18]"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-        >
-          {localize(data.introHighlight, lang)}
-        </motion.p>
-
-        <motion.p
-          className="text-gray-700 text-lg md:text-xl leading-relaxed"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-        >
-          {localize(data.introText, lang)}
-        </motion.p>
-      </div>
-
-      {/* FEATURES */}
-      <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12">
-        {data.features?.map((f: any, i: number) => (
-          <motion.div
-            key={i}
-            className="p-8 rounded-3xl shadow-xl bg-white border-t-4 border-[#851A18]"
-            initial={{ opacity: 0, y: 40 }}
+      <div className="max-w-7xl mx-auto px-6 md:px-12 py-20 md:py-28">
+        {/* INTRO */}
+        <div className="max-w-3xl space-y-5">
+          <motion.p
+            className="text-xl md:text-2xl font-semibold text-ink"
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
           >
-            <h3 className="text-2xl font-bold mb-4 text-[#851A18]">
-              {localize(f.title, lang)}
-            </h3>
-            <p className="text-gray-800 leading-relaxed">
-              {localize(f.description, lang)}
-            </p>
-          </motion.div>
-        ))}
-      </div>
+            {localize(data.introHighlight, lang)}
+          </motion.p>
 
-      {/* CTA */}
-      <div className="text-center space-y-6">
-        <motion.h2
-          className="text-4xl md:text-5xl font-bold text-[#851A18]"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-        >
-          {localize(data.ctaTitle, lang)}
-        </motion.h2>
+          <motion.p
+            className="text-base md:text-lg leading-relaxed text-copy"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
+            {localize(data.introText, lang)}
+          </motion.p>
+        </div>
 
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          className="bg-[#851A18] text-white font-bold py-4 px-10 rounded-full"
-          onClick={() => navigate(withLocale("/contact", activeLocale))}
-        >
-          {localize(data.ctaButtonText, lang)}
-        </motion.button>
+        {/* FEATURES */}
+        <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+          {data.features?.map((f: any, i: number) => (
+            <motion.article
+              key={i}
+              className="glass group rounded-2xl p-7 ltr:border-l-2 rtl:border-r-2 border-[#d6132b]/60 transition-all duration-300 hover:border-[#d6132b]/40 hover:-translate-y-1 hover:shadow-[0_12px_40px_-12px_rgba(214,19,43,0.45)]"
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: i * 0.1 }}
+            >
+              <h3 className="text-xl md:text-2xl font-semibold mb-4 text-ink">
+                {localize(f.title, lang)}
+              </h3>
+              <p className="text-sm leading-relaxed text-muted">
+                {localize(f.description, lang)}
+              </p>
+            </motion.article>
+          ))}
+        </div>
+
+        {/* CTA */}
+        <div className="mt-20">
+          <div className="glass rounded-2xl text-center py-16 px-6">
+            <motion.h2
+              className="text-3xl md:text-5xl font-bold text-gradient mb-8"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7 }}
+            >
+              {localize(data.ctaTitle, lang)}
+            </motion.h2>
+
+            <motion.button
+              whileHover={shouldReduceMotion ? {} : { scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              className="btn-glow text-white font-semibold py-3 px-8 rounded-full text-base md:text-lg"
+              onClick={() => navigate(withLocale("/contact", activeLocale))}
+            >
+              {localize(data.ctaButtonText, lang)}
+            </motion.button>
+          </div>
+        </div>
       </div>
     </section>
   );

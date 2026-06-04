@@ -6,7 +6,15 @@ export default {
       colors: {
         'dark-blue': '#080844',
         'cream': '#EBEBDF',
-        'orange': '#EA7946',
+        'orange': '#D6132B',
+        // Theme-aware semantic tokens (values flip via CSS vars in index.css)
+        canvas: 'var(--canvas)',     // page background
+        panel: 'var(--panel)',       // solid card/surface
+        ink: 'var(--ink)',           // headings / strong text
+        copy: 'var(--copy)',         // body text
+        muted: 'var(--muted)',       // secondary text
+        eyebrow: 'var(--eyebrow)',   // small accent labels
+        hairline: 'var(--hairline)', // borders
       },
       animation: {
         'float-1': 'float1 6s ease-in-out infinite',

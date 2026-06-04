@@ -23,3 +23,8 @@ dist-ssr
 *.sln
 *.sw?
 .env
+
+# tool noise
+.claude-flow
+.ruvector
+.swarm

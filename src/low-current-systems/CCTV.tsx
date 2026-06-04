@@ -1,115 +1,118 @@
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import OptimizedImage from "../components/OptimizedImage";
 
 const CCTV: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const shouldReduceMotion = useReducedMotion();
+  const isRTL = i18n.language.startsWith("ar");
 
-  const containerVariants = {
-    hidden: { opacity: 0, y: 50 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { staggerChildren: 0.2, duration: 0.6 },
-    },
-  };
+  const deploymentPoints = [
+    t("lowCurrent.cctv.deploymentPoints.point1"),
+    t("lowCurrent.cctv.deploymentPoints.point2"),
+    t("lowCurrent.cctv.deploymentPoints.point3"),
+    t("lowCurrent.cctv.deploymentPoints.point4"),
+  ];
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-  };
+  const fadeUp = (delay = 0) =>
+    shouldReduceMotion
+      ? {}
+      : {
+          initial: { opacity: 0, y: 28 },
+          whileInView: { opacity: 1, y: 0 },
+          viewport: { once: true },
+          transition: { duration: 0.6, delay },
+        };
 
   return (
-    <motion.section
-      className="bg-[#EBEBDF] p-10 md:p-20 rounded-lg shadow-lg max-w-5xl mx-auto mt-20"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-    >
-      {/* صورة الجهاز */}
-      <motion.div
-        className="flex justify-center mb-8"
-        variants={itemVariants}
-      >
-        <OptimizedImage
-          src="/images/CCTV_solutions.png"
-          alt="CCTV and enterprise video surveillance solutions — AMT security integration"
-          className="w-full max-w-4xl object-contain rounded-lg shadow-md"
-          width={896}
-          height={504}
-          loading="lazy"
-        />
-      </motion.div>
-
-      {/* العنوان الرئيسي */}
-      <motion.h1
-        className="text-4xl md:text-5xl font-extrabold mb-6 text-center"
-        style={{ color: "#851A18" }}
-        variants={itemVariants}
-      >
-        {t("lowCurrent.cctv.title")}
-      </motion.h1>
-
-      {/* وصف مختصر */}
-      <motion.p
-        className="text-gray-800 text-lg md:text-xl leading-relaxed mb-8 text-center"
-        variants={itemVariants}
-      >
-        {t("lowCurrent.cctv.description")}
-      </motion.p>
-
-      {/* النقاط الأساسية */}
-      <motion.div
-        className="bg-white p-6 rounded-lg shadow-md mb-8"
-        variants={itemVariants}
-      >
-        <h2
-          className="text-2xl font-semibold mb-4 text-center"
-          style={{ color: "#851A18" }}
+    <section dir={isRTL ? "rtl" : "ltr"} className="relative w-full">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 py-20 md:py-28">
+        {/* ===== HERO IMAGE ===== */}
+        <motion.div
+          {...fadeUp(0)}
+          className="rounded-2xl overflow-hidden border border-hairline mb-12"
         >
-          {t("lowCurrent.cctv.deployment")}
-        </h2>
-        <ul className="list-disc list-inside text-gray-700 text-lg space-y-3">
-          <li>{t("lowCurrent.cctv.deploymentPoints.point1")}</li>
-          <li>{t("lowCurrent.cctv.deploymentPoints.point2")}</li>
-          <li>{t("lowCurrent.cctv.deploymentPoints.point3")}</li>
-          <li>{t("lowCurrent.cctv.deploymentPoints.point4")}</li>
-        </ul>
-      </motion.div>
+          <OptimizedImage
+            src="/images/CCTV_solutions.png"
+            alt="CCTV and enterprise video surveillance solutions — AMT security integration"
+            className="w-full object-cover"
+            width={1280}
+            height={600}
+            priority
+          />
+        </motion.div>
 
-      {/* Cloud Solutions */}
-      <motion.div
-        className="bg-white p-6 rounded-lg shadow-md mb-8"
-        variants={itemVariants}
-      >
-        <h2
-          className="text-2xl font-semibold mb-4 text-center"
-          style={{ color: "#851A18" }}
-        >
-          {t("lowCurrent.cctv.cloudTitle")}
-        </h2>
-        <p className="text-gray-700 text-lg md:text-xl leading-relaxed">
-          {t("lowCurrent.cctv.cloudDesc")}
-        </p>
-      </motion.div>
+        {/* ===== TITLE + INTRO ===== */}
+        <div className="text-center max-w-3xl mx-auto">
+          <motion.p
+            {...fadeUp(0.05)}
+            className="text-eyebrow text-xs tracking-[0.2em] font-semibold uppercase mb-4"
+          >
+            {isRTL ? "أنظمة المراقبة" : "Video Surveillance"}
+          </motion.p>
+          <motion.h1
+            {...fadeUp(0.1)}
+            className="font-display text-4xl md:text-5xl font-extrabold text-gradient"
+          >
+            {t("lowCurrent.cctv.title")}
+          </motion.h1>
+          <motion.p
+            {...fadeUp(0.18)}
+            className="mt-6 text-base md:text-lg leading-relaxed text-copy"
+          >
+            {t("lowCurrent.cctv.description")}
+          </motion.p>
+        </div>
 
-      {/* Video Management Software */}
-      <motion.div
-        className="bg-white p-6 rounded-lg shadow-md"
-        variants={itemVariants}
-      >
-        <h2
-          className="text-2xl font-bold mb-6 text-center"
-          style={{ color: "#851A18" }}
+        {/* ===== DEPLOYMENT ===== */}
+        <motion.div
+          {...fadeUp(0.1)}
+          whileHover={shouldReduceMotion ? {} : { y: -4 }}
+          className="glass rounded-2xl p-8 mt-14 transition-all duration-300 hover:border-[#d6132b]/40 hover:shadow-[0_20px_50px_-20px_rgba(214,19,43,0.5)]"
         >
-          {t("lowCurrent.cctv.vmsTitle")}
-        </h2>
-        <p className="text-gray-700 text-lg md:text-xl leading-relaxed space-y-4">
-          {t("lowCurrent.cctv.vmsDesc")}
-        </p>
-      </motion.div>
-    </motion.section>
+          <h2 className="text-2xl font-semibold text-ink text-center mb-6">
+            {t("lowCurrent.cctv.deployment")}
+          </h2>
+          <ul className="space-y-3 max-w-3xl mx-auto">
+            {deploymentPoints.map((point, idx) => (
+              <li key={idx} className="flex items-start gap-3 text-muted leading-relaxed">
+                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#d6132b]" />
+                <span>{point}</span>
+              </li>
+            ))}
+          </ul>
+        </motion.div>
+
+        {/* ===== CLOUD SOLUTIONS ===== */}
+        <motion.div
+          {...fadeUp(0.1)}
+          whileHover={shouldReduceMotion ? {} : { y: -4 }}
+          className="glass rounded-2xl p-8 mt-8 transition-all duration-300 hover:border-[#d6132b]/40 hover:shadow-[0_20px_50px_-20px_rgba(214,19,43,0.5)]"
+        >
+          <h2 className="text-2xl font-semibold text-ink text-center mb-4">
+            {t("lowCurrent.cctv.cloudTitle")}
+          </h2>
+          <p className="text-muted text-base md:text-lg leading-relaxed">
+            {t("lowCurrent.cctv.cloudDesc")}
+          </p>
+        </motion.div>
+
+        {/* ===== VIDEO MANAGEMENT SOFTWARE ===== */}
+        <motion.div
+          {...fadeUp(0.1)}
+          whileHover={shouldReduceMotion ? {} : { y: -4 }}
+          className="glass rounded-2xl p-8 mt-8 transition-all duration-300 hover:border-[#d6132b]/40 hover:shadow-[0_20px_50px_-20px_rgba(214,19,43,0.5)]"
+        >
+          <h2 className="text-2xl font-bold text-ink text-center mb-6">
+            {t("lowCurrent.cctv.vmsTitle")}
+          </h2>
+          <p className="text-muted text-base md:text-lg leading-relaxed">
+            {t("lowCurrent.cctv.vmsDesc")}
+          </p>
+        </motion.div>
+      </div>
+    </section>
   );
 };
 

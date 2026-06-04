@@ -101,8 +101,7 @@ const SITE_WIDE: RelatedLink[] = [
   { to: "/projects", en: "Projects", ar: "المشاريع" },
 ];
 
-const ctaBoxClass =
-  "rounded-xl border border-gray-200 bg-gradient-to-br from-[#faf7f7] to-white p-6 md:p-8 shadow-sm";
+const ctaBoxClass = "glass rounded-xl p-6 md:p-8";
 
 const ServiceSeoArticle: FC<{ pageId: ServicePageId }> = ({ pageId }) => {
   const { locale } = useParams();
@@ -134,50 +133,50 @@ const ServiceSeoArticle: FC<{ pageId: ServicePageId }> = ({ pageId }) => {
         ) : null}
       </Helmet>
       <main
-        className="bg-white text-[#292929] pt-24 pb-28 px-6 md:px-20"
+        className="bg-canvas text-copy pt-24 pb-28 px-6 md:px-20"
         dir={dir}
         lang={activeLocale}
       >
         <article className="max-w-3xl mx-auto">
           <BreadcrumbsNav items={crumbs} locale={activeLocale} />
 
-          <h1 className="text-4xl md:text-5xl font-extrabold text-[#851A18] mb-8 leading-tight">
+          <h1 className="text-gradient font-display text-4xl md:text-5xl font-extrabold mb-8 leading-tight">
             {copy.h1}
           </h1>
 
-          <p className="text-lg leading-relaxed text-gray-700">{copy.introLead}</p>
+          <p className="text-lg leading-relaxed text-copy">{copy.introLead}</p>
 
-          <ul className="mt-6 list-disc ps-6 space-y-2 text-gray-800 leading-relaxed marker:text-[#851A18]">
+          <ul className="mt-6 list-disc ps-6 space-y-2 text-copy leading-relaxed marker:text-[#d6132b]">
             {copy.outcomeBullets.map((b) => (
               <li key={b}>{b}</li>
             ))}
           </ul>
 
-          <p className="mt-8 text-lg leading-relaxed text-gray-700">{copy.paragraphs[0]}</p>
+          <p className="mt-8 text-lg leading-relaxed text-copy">{copy.paragraphs[0]}</p>
 
           {h2s.map((h2, i) => (
             <section key={`${pageId}-sec-${i}`} className="mt-12">
-              <h2 className="text-2xl md:text-3xl font-bold text-[#851A18]">{h2}</h2>
-              <p className="mt-4 text-lg leading-relaxed text-gray-700">{copy.paragraphs[i + 1]}</p>
+              <h2 className="text-2xl md:text-3xl font-bold text-ink">{h2}</h2>
+              <p className="mt-4 text-lg leading-relaxed text-copy">{copy.paragraphs[i + 1]}</p>
             </section>
           ))}
 
           <section className={`mt-14 ${ctaBoxClass}`} aria-labelledby={`${pageId}-mid-cta`}>
-            <h2 id={`${pageId}-mid-cta`} className="text-xl md:text-2xl font-bold text-[#851A18]">
+            <h2 id={`${pageId}-mid-cta`} className="text-xl md:text-2xl font-bold text-ink">
               {copy.midCta.title}
             </h2>
-            <p className="mt-3 text-gray-700 leading-relaxed">{copy.midCta.body}</p>
+            <p className="mt-3 text-copy leading-relaxed">{copy.midCta.body}</p>
             <div className="mt-6 flex flex-col sm:flex-row flex-wrap gap-3">
               <Link
                 to={to("/contact")}
-                className="inline-flex justify-center rounded-lg bg-[#851A18] px-5 py-3 text-white font-semibold hover:bg-[#6d1514] transition-colors"
+                className="btn-glow inline-flex justify-center rounded-lg px-5 py-3 text-white font-semibold"
               >
                 {copy.midCta.primaryCta}
               </Link>
               {copy.midCta.secondaryLink ? (
                 <Link
                   to={to(copy.midCta.secondaryLink.to)}
-                  className="inline-flex justify-center rounded-lg border-2 border-[#851A18] px-5 py-3 text-[#851A18] font-semibold hover:bg-[#851A18]/5 transition-colors"
+                  className="glass inline-flex justify-center rounded-lg px-5 py-3 text-[#f12942] font-semibold transition-colors"
                 >
                   {activeLocale === "ar"
                     ? copy.midCta.secondaryLink.ar
@@ -185,7 +184,7 @@ const ServiceSeoArticle: FC<{ pageId: ServicePageId }> = ({ pageId }) => {
                 </Link>
               ) : null}
             </div>
-            <p className="mt-4 text-sm text-gray-600">{copy.midCta.secondaryLine}</p>
+            <p className="mt-4 text-sm text-muted">{copy.midCta.secondaryLine}</p>
           </section>
 
           <section
@@ -193,22 +192,22 @@ const ServiceSeoArticle: FC<{ pageId: ServicePageId }> = ({ pageId }) => {
             aria-labelledby={`${pageId}-faq-heading`}
             id="faq"
           >
-            <h2 id={`${pageId}-faq-heading`} className="text-2xl md:text-3xl font-bold text-[#851A18]">
+            <h2 id={`${pageId}-faq-heading`} className="text-2xl md:text-3xl font-bold text-ink">
               {activeLocale === "ar" ? "الأسئلة الشائعة" : "Frequently asked questions"}
             </h2>
             <div className="mt-6 space-y-3">
               {faqs.map((item, i) => (
                 <details
                   key={`${pageId}-faq-${i}`}
-                  className="group rounded-lg border border-gray-200 bg-white open:shadow-sm"
+                  className="group glass rounded-lg"
                 >
-                  <summary className="cursor-pointer list-none px-4 py-3 font-semibold text-[#292929] [&::-webkit-details-marker]:hidden flex justify-between gap-2 items-start">
+                  <summary className="cursor-pointer list-none px-4 py-3 font-semibold text-ink [&::-webkit-details-marker]:hidden flex justify-between gap-2 items-start">
                     <span>{item.q}</span>
-                    <span className="text-[#851A18] shrink-0 group-open:rotate-180 transition-transform">
+                    <span className="text-[#d6132b] shrink-0 group-open:rotate-180 transition-transform">
                       ▾
                     </span>
                   </summary>
-                  <p className="px-4 pb-4 pt-0 text-gray-700 leading-relaxed border-t border-gray-100">
+                  <p className="px-4 pb-4 pt-0 text-copy leading-relaxed border-t border-hairline">
                     {item.a}
                   </p>
                 </details>
@@ -217,38 +216,38 @@ const ServiceSeoArticle: FC<{ pageId: ServicePageId }> = ({ pageId }) => {
           </section>
 
           <section
-            className={`mt-16 ${ctaBoxClass} border-[#851A18]/25`}
+            className={`mt-16 ${ctaBoxClass}`}
             aria-labelledby={`${pageId}-bottom-cta`}
           >
-            <h2 id={`${pageId}-bottom-cta`} className="text-xl md:text-2xl font-bold text-[#851A18]">
+            <h2 id={`${pageId}-bottom-cta`} className="text-xl md:text-2xl font-bold text-ink">
               {copy.bottomCta.title}
             </h2>
-            <p className="mt-3 text-gray-700 leading-relaxed">{copy.bottomCta.body}</p>
+            <p className="mt-3 text-copy leading-relaxed">{copy.bottomCta.body}</p>
             <Link
               to={to("/contact")}
-              className="mt-6 inline-flex rounded-lg bg-[#851A18] px-5 py-3 text-white font-semibold hover:bg-[#6d1514] transition-colors"
+              className="btn-glow mt-6 inline-flex rounded-lg px-5 py-3 text-white font-semibold"
             >
               {copy.bottomCta.primaryCta}
             </Link>
           </section>
 
           <nav
-            className="mt-16 pt-10 border-t border-gray-200"
+            className="mt-16 pt-10 border-t border-hairline"
             aria-label={activeLocale === "ar" ? "روابط ذات صلة" : "Related services"}
           >
-            <h3 className="text-lg font-semibold text-[#292929] mb-4">
+            <h3 className="text-lg font-semibold text-ink mb-4">
               {activeLocale === "ar" ? "روابط ذات صلة" : "Related services & site links"}
             </h3>
             <ul className="space-y-3">
               {relatedLinks.map((item) => (
                 <li key={item.to}>
-                  <Link to={to(item.to)} className="text-[#851A18] font-medium hover:underline">
+                  <Link to={to(item.to)} className="text-[#d6132b] font-medium hover:text-[#f12942] hover:underline">
                     {activeLocale === "ar" ? item.ar : item.en}
                   </Link>
                 </li>
               ))}
               <li>
-                <Link to={to("/")} className="text-[#851A18] font-medium hover:underline">
+                <Link to={to("/")} className="text-[#d6132b] font-medium hover:text-[#f12942] hover:underline">
                   {activeLocale === "ar" ? "العودة إلى الصفحة الرئيسية" : "Back to home"}
                 </Link>
               </li>

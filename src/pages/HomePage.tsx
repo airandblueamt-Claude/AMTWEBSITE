@@ -1,21 +1,32 @@
 import Hero from "../components/Hero";
 import Solutions from "../components/Solutions";
-import WhyChooseUs from "../components/WhyChooseUs";
 import PartnersSection from "../components/PartnersSection";
+import WhyChooseUs from "../components/WhyChooseUs";
+import ImpactStats from "../components/ImpactStats";
 import ClientsSection from "../components/ClientsSection";
+import HomeTestimonials from "../components/HomeTestimonials";
 import LatestNews from "../components/LatestNews";
+import FinalCTA from "../components/FinalCTA";
+import ScrollProgress from "../components/ScrollProgress";
 
 /**
- * Home route bundles all primary sections for lazy-loading with the page.
+ * Home route — best-practice landing flow:
+ * Hero (value prop) → Solutions (what) → Partners (credibility) →
+ * Why (differentiators) → Impact (proof) → Clients (social proof) →
+ * News (activity) → Final CTA (conversion).
  */
 const HomePage = () => (
   <>
+    <ScrollProgress />
     <Hero />
     <Solutions />
-    <WhyChooseUs />
     <PartnersSection />
+    <WhyChooseUs />
+    <ImpactStats />
     <ClientsSection />
+    <HomeTestimonials />
     <LatestNews />
+    <FinalCTA />
   </>
 );
 

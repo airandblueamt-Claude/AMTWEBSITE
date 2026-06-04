@@ -1,5 +1,8 @@
+import type { FC } from "react";
 import ServiceSeoArticle from "./ServiceSeoArticle";
 
-export default function SmartBuildingSolutionsPage() {
-  return <ServiceSeoArticle pageId="smart-building-solutions" />;
-}
+const SmartBuildingSolutionsPage: FC = () => (
+  <ServiceSeoArticle pageId="smart-building-solutions" />
+);
+
+export default SmartBuildingSolutionsPage;

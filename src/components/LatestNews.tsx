@@ -1,26 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Share2 } from 'lucide-react';
+import { motion, useReducedMotion } from 'framer-motion';
 import { Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { sanity, urlFor } from '../sanityClient';
 import { localize } from '../utils/localize';
+import { LOCAL_NEWS } from '../data/localNews';
 import { AppLocale, DEFAULT_LOCALE, isSupportedLocale, withLocale } from '../utils/localeRouting';
 import OptimizedImage from './OptimizedImage';
+import ScrollRow from './ScrollRow';
 
 interface NewsItem {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   title: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   description: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   image: any;
   slug: string;
 }
 
 const LatestNews: React.FC = () => {
   const [newsData, setNewsData] = useState<NewsItem[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
   const { t } = useTranslation();
   const { locale } = useParams();
   const activeLocale: AppLocale = isSupportedLocale(locale) ? locale : DEFAULT_LOCALE;
+  const isRTL = activeLocale === 'ar';
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
     sanity
@@ -32,6 +37,7 @@ const LatestNews: React.FC = () => {
           "slug": slug.current
         }
       `, { locale: activeLocale })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .then((data: any[]) => {
         const mapped = data.map((item) => ({
           title: item.title,
@@ -39,138 +45,81 @@ const LatestNews: React.FC = () => {
           image: item.mainImage,
           slug: item.slug,
         }));
-
-        setNewsData(mapped);
+        // Locally-authored items (no Sanity token) appear first.
+        const local = LOCAL_NEWS.map((n) => ({
+          title: n.title, description: n.description, image: n.image, slug: n.slug,
+        }));
+        setNewsData([...local, ...mapped]);
       });
   }, [activeLocale]);
 
-  const prevNews = () =>
-    setCurrentIndex((prev) =>
-      prev === 0 ? newsData.length - 1 : prev - 1
-    );
-
-  const nextNews = () =>
-    setCurrentIndex((prev) =>
-      prev === newsData.length - 1 ? 0 : prev + 1
-    );
-
-  useEffect(() => {
-    if (!newsData.length) return;
-    const interval = setInterval(nextNews, 5000);
-    return () => clearInterval(interval);
-  }, [newsData]);
-
   if (!newsData.length) {
     return (
-      <p className="text-center py-20 text-white">
+      <p className="text-center py-20 text-muted">
         {t("common.loading")}
       </p>
     );
   }
 
-  const sectionStyle = {
-    backgroundImage: "url('/bac.png')",
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-    backgroundRepeat: "no-repeat",
-  };
-
   return (
-    <section className="relative py-24 px-6" style={sectionStyle}>
-      {/* Overlay */}
-      <div
-        className="absolute inset-0 backdrop-blur-[2px]"
-        style={{ backgroundColor: "rgba(76,77,78,0.85)" }}
-      />
+    <section className="relative py-20 md:py-28" dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className="max-w-7xl mx-auto px-6 md:px-12">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: reduceMotion ? 0 : 28 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-14"
+        >
+          <span className="text-eyebrow text-xs tracking-[0.2em] font-semibold uppercase">
+            {t("news.eyebrow", "Newsroom")}
+          </span>
+          <h2 className="mt-3 text-3xl md:text-4xl font-bold text-gradient">
+            {t("news.latestNews")}
+          </h2>
+        </motion.div>
 
-      <div className="relative z-10">
-        <h2 className="text-2xl md:text-3xl font-bold mb-12 text-center text-white">
-          {t("news.latestNews")}
-        </h2>
-
-        <div className="max-w-6xl mx-auto relative flex items-center">
-          {/* Left Arrow */}
-          <button
-            onClick={prevNews}
-            type="button"
-            aria-label="Previous news slide"
-            className="absolute top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-white/80 hover:bg-white shadow left-0 sm:-left-4 md:-left-12 lg:-left-16"
-          >
-            <ChevronLeft size={28} className="text-black" />
-          </button>
-
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={newsData[currentIndex].slug}
-              initial={{ opacity: 0, x: 100 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -100 }}
-              transition={{ duration: 0.5 }}
-              className="flex flex-col md:flex-row bg-white/90 backdrop-blur-md rounded-2xl overflow-hidden shadow-xl w-full"
+        {/* Auto-scrolling row of compact news cards */}
+        <ScrollRow>
+          {newsData.map((item) => (
+            <article
+              key={item.slug}
+              className="group shrink-0 w-[300px] sm:w-[340px] glass rounded-2xl overflow-hidden border border-hairline hover:border-[#d6132b]/40 transition-all duration-500 hover:shadow-[0_28px_70px_-24px_rgba(214,19,43,0.5)] motion-safe:hover:-translate-y-1.5"
             >
               <Link
-                to={withLocale(`/news/${newsData[currentIndex].slug}`, activeLocale)}
-                className="flex flex-col md:flex-row w-full"
+                to={withLocale(`/news/${item.slug}`, activeLocale)}
+                className="flex flex-col w-full"
               >
                 {/* Image */}
-                <div className="relative w-full md:w-1/2 group">
+                <div className="relative w-full h-44 overflow-hidden">
                   <OptimizedImage
-                    src={urlFor(newsData[currentIndex].image)
-                      .width(900)
-                      .height(600)
-                      .url()}
-                    alt={`${localize(newsData[currentIndex].title, activeLocale)} — AMT latest news cover image`}
-                    className="w-full h-64 md:h-full object-cover"
-                    width={900}
-                    height={600}
-                    priority
+                    src={typeof item.image === "string"
+                      ? item.image
+                      : urlFor(item.image).width(680).height(400).url()}
+                    alt={`${localize(item.title, activeLocale)} — AMT latest news cover image`}
+                    className="w-full h-full object-cover will-change-transform transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-safe:group-hover:scale-105"
+                    width={680}
+                    height={400}
                   />
-                  <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px] opacity-0 group-hover:opacity-100 transition">
-                    <div className="flex items-center justify-center h-full">
-                      <Share2 size={36} className="text-white" />
-                    </div>
-                  </div>
                 </div>
 
-                {/* Text */}
-                <div className="p-8 flex flex-col justify-center md:w-1/2 text-white">
-                  <h3 className="text-lg md:text-xl font-bold mb-3 uppercase text-white">
-                    {localize(newsData[currentIndex].title, activeLocale)}
+                {/* Body */}
+                <div className="p-5">
+                  <span className="inline-flex items-center gap-2 text-eyebrow text-[10px] tracking-[0.22em] font-semibold uppercase text-[#d6132b]">
+                    {t("news.label", "News")}
+                  </span>
+                  <h3 className="mt-2 text-base font-bold uppercase text-ink line-clamp-2">
+                    {localize(item.title, activeLocale)}
                   </h3>
-                  <p className="leading-relaxed text-white/80">
-                    {localize(newsData[currentIndex].description, activeLocale)}
+                  <p className="mt-2 text-sm leading-relaxed text-muted line-clamp-2">
+                    {localize(item.description, activeLocale)}
                   </p>
                 </div>
               </Link>
-            </motion.div>
-          </AnimatePresence>
-
-          {/* Right Arrow */}
-          <button
-            onClick={nextNews}
-            type="button"
-            aria-label="Next news slide"
-            className="absolute top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-white/80 hover:bg-white shadow right-0 sm:-right-4 md:-right-12 lg:-right-16"
-          >
-            <ChevronRight size={28} className="text-black" />
-          </button>
-        </div>
-
-        {/* Dots */}
-        <div className="flex justify-center mt-8 space-x-2">
-          {newsData.map((_, index) => (
-            <button
-              type="button"
-              key={index}
-              onClick={() => setCurrentIndex(index)}
-              aria-label={`Go to news slide ${index + 1}`}
-              className={`w-3 h-3 rounded-full cursor-pointer transition ${index === currentIndex
-                  ? 'bg-white'
-                  : 'bg-white/40'
-                }`}
-            />
+            </article>
           ))}
-        </div>
+        </ScrollRow>
       </div>
     </section>
   );

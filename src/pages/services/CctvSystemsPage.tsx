@@ -1,5 +1,6 @@
+import type { FC } from "react";
 import ServiceSeoArticle from "./ServiceSeoArticle";
 
-export default function CctvSystemsPage() {
-  return <ServiceSeoArticle pageId="cctv-systems" />;
-}
+const CctvSystemsPage: FC = () => <ServiceSeoArticle pageId="cctv-systems" />;
+
+export default CctvSystemsPage;

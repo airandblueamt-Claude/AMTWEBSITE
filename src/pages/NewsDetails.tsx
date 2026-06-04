@@ -6,16 +6,27 @@ import { sanity, urlFor } from "../sanityClient";
 import { localize } from "../utils/localize";
 import OptimizedImage from "../components/OptimizedImage";
 import { STATIC_SEO_NEWS_BY_SLUG } from "../content/staticSeoNewsArticles";
+import { LOCAL_NEWS_BY_SLUG } from "../data/localNews";
 import { AppLocale, DEFAULT_LOCALE, isSupportedLocale, withLocale } from "../utils/localeRouting";
 import { absoluteUrl, ORG_NAME } from "../seo/siteConfig";
 import { serializeJsonLd, type JsonValue } from "../seo/jsonLd";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 interface NewsDetailsData {
   title: any;
   fullText: any;
   mainImage: any;
   gallery?: any[];
   videoUrl?: string;
+}
+/* eslint-enable @typescript-eslint/no-explicit-any */
+
+// Resolve a cover-image URL whether it's a Sanity image ref or a local string path.
+function mainImageUrl(img: unknown, w = 1200): string {
+  if (!img) return "";
+  if (typeof img === "string") return img;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return urlFor(img as any).width(w).url();
 }
 
 function staticSeoNewsToDetails(slug: string): NewsDetailsData | null {
@@ -35,8 +46,10 @@ function plainTextFromPortable(val: unknown, lang: string): string {
   if (typeof val === "string") return val;
   if (Array.isArray(val)) {
     return val
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .map((block: any) => {
         if (block?._type === "block" && Array.isArray(block.children)) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           return block.children.map((c: any) => c?.text ?? "").join("");
         }
         return "";
@@ -44,6 +57,7 @@ function plainTextFromPortable(val: unknown, lang: string): string {
       .join(" ")
       .trim();
   }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return String(localize(val as any, lang)).replace(/\s+/g, " ").trim();
 }
 
@@ -71,6 +85,13 @@ const NewsDetails: React.FC = () => {
     const staticData = staticSeoNewsToDetails(slug);
     if (staticData) {
       setNews(staticData);
+      setLoading(false);
+      return;
+    }
+
+    const local = LOCAL_NEWS_BY_SLUG[slug];
+    if (local) {
+      setNews({ title: local.title, fullText: local.body, mainImage: local.coverImage });
       setLoading(false);
       return;
     }
@@ -125,26 +146,29 @@ const NewsDetails: React.FC = () => {
           mainEntityOfPage: { "@type": "WebPage", "@id": canonical },
         };
         if (news.mainImage) {
-          base.image = [urlFor(news.mainImage).width(1200).url()];
+          base.image = [mainImageUrl(news.mainImage, 1200)];
         }
         return base as JsonValue;
       })()
     : null;
 
   if (loading) {
-    return <p className="text-center py-20">{t("common.loading")}</p>;
+    return <p className="text-center py-20 text-muted">{t("common.loading")}</p>;
   }
 
   if (!news) {
     return (
-      <p className="text-center py-20 text-gray-600">
+      <p className="text-center py-20 text-muted">
         {locale === "ar" ? "المقال غير متوفر." : "This article could not be found."}
       </p>
     );
   }
 
   return (
-    <section className="max-w-4xl mx-auto py-20 px-6">
+    <section
+      dir={lang === "ar" ? "rtl" : "ltr"}
+      className="max-w-3xl mx-auto py-20 md:py-28 px-6"
+    >
       <Helmet>
         <title>{`${truncate(title, 52)} | ${ORG_NAME}`}</title>
         <meta name="description" content={description || title} />
@@ -161,11 +185,11 @@ const NewsDetails: React.FC = () => {
           <>
             <meta
               property="og:image"
-              content={urlFor(news.mainImage).width(1200).url()}
+              content={mainImageUrl(news.mainImage, 1200)}
             />
             <meta
               name="twitter:image"
-              content={urlFor(news.mainImage).width(1200).url()}
+              content={mainImageUrl(news.mainImage, 1200)}
             />
           </>
         )}
@@ -177,30 +201,34 @@ const NewsDetails: React.FC = () => {
         )}
       </Helmet>
 
-      <Link to={withLocale("/", locale)} className="underline mb-6 inline-block">
+      <Link
+        to={withLocale("/", locale)}
+        className="inline-flex items-center gap-1.5 mb-8 text-[#f12942] hover:text-[#d6132b] text-sm font-semibold tracking-wide transition-colors"
+      >
+        <span className="rtl:rotate-180" aria-hidden="true">←</span>
         {t("common.backToNews")}
       </Link>
 
-      <h1 className="text-3xl font-bold mb-6">{title}</h1>
+      <h1 className="text-3xl md:text-4xl font-extrabold text-ink mb-8 leading-tight">{title}</h1>
 
       {news.videoUrl ? (
         <video
           src={news.videoUrl}
           controls
-          className="w-full rounded-xl mb-8"
+          className="w-full rounded-2xl mb-10 ring-1 ring-hairline"
         />
       ) : news.mainImage ? (
         <OptimizedImage
-          src={urlFor(news.mainImage).width(1200).url()}
+          src={mainImageUrl(news.mainImage, 1200)}
           alt={`${title} — news feature image`}
-          className="rounded-xl mb-8 w-full h-auto"
+          className="rounded-2xl mb-10 w-full h-auto ring-1 ring-hairline"
           width={1200}
           height={675}
           priority
         />
       ) : null}
 
-      <p className="whitespace-pre-line mb-10">{localize(news.fullText, lang)}</p>
+      <p className="whitespace-pre-line mb-10 text-copy leading-relaxed text-base md:text-lg">{localize(news.fullText, lang)}</p>
 
       {news.gallery && (
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -209,7 +237,7 @@ const NewsDetails: React.FC = () => {
               key={i}
               src={urlFor(img).width(600).url()}
               alt={`${title} — gallery photo ${i + 1}`}
-              className="rounded-lg w-full h-auto object-cover"
+              className="rounded-xl w-full h-auto object-cover ring-1 ring-hairline"
               width={600}
               height={400}
               loading="lazy"

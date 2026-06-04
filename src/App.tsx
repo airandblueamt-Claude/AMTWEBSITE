@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import WhatsAppFloating from "./components/WhatsAppFloating";
+import AiAssistant from "./components/AiAssistant";
 import RouteSeo from "./seo/RouteSeo";
 import Analytics from "./components/Analytics";
 import {
@@ -18,13 +18,10 @@ const HomePage = lazy(() => import("./pages/HomePage"));
 const About = lazy(() => import("./components/About"));
 const Solutions = lazy(() => import("./components/Solutions"));
 const SolutionDetails = lazy(() => import("./components/SolutionDetails"));
-const WhyChooseUs = lazy(() => import("./components/WhyChooseUs"));
-const PartnersSection = lazy(() => import("./components/PartnersSection"));
-const ClientsSection = lazy(() => import("./components/ClientsSection"));
-const LatestNews = lazy(() => import("./components/LatestNews"));
 const Projects = lazy(() => import("./components/Projects"));
 const Contact = lazy(() => import("./components/Contact"));
 const NewsDetails = lazy(() => import("./pages/NewsDetails"));
+const NotFound = lazy(() => import("./components/NotFound"));
 
 const DataNetwork = lazy(() => import("./ict/DataNetwork"));
 const UnifiedCommunications = lazy(() => import("./ict/UnifiedCommunications"));
@@ -82,7 +79,8 @@ const LocaleLayout: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white text-dark-blue overflow-x-hidden font-body">
+    <div className="min-h-screen bg-transparent text-copy overflow-x-hidden font-body">
+      <div className="amt-atmosphere" aria-hidden="true" />
       <RouteSeo />
       <Analytics />
 
@@ -124,11 +122,11 @@ const LocaleLayout: React.FC = () => {
           <Route path="av/interactive-screens" element={<InteractiveScreens />} />
 
           <Route path="osp-solutions" element={<OSP_Solutions />} />
-          <Route path="*" element={<Navigate to={withLocale("/", activeLocale)} replace />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
 
-      <WhatsAppFloating />
+      <AiAssistant />
 
       <Footer />
     </div>

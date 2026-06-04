@@ -1,5 +1,8 @@
+import type { FC } from "react";
 import ServiceSeoArticle from "./ServiceSeoArticle";
 
-export default function AccessControlServicePage() {
-  return <ServiceSeoArticle pageId="access-control" />;
-}
+const AccessControlServicePage: FC = () => (
+  <ServiceSeoArticle pageId="access-control" />
+);
+
+export default AccessControlServicePage;

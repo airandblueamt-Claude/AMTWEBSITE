@@ -1,5 +1,8 @@
+import type { FC } from "react";
 import ServiceSeoArticle from "./ServiceSeoArticle";
 
-export default function AudioVisualSystemsPage() {
-  return <ServiceSeoArticle pageId="audio-visual-systems" />;
-}
+const AudioVisualSystemsPage: FC = () => (
+  <ServiceSeoArticle pageId="audio-visual-systems" />
+);
+
+export default AudioVisualSystemsPage;

@@ -2,17 +2,160 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ===== Scroll Fade Animation ===== */
-.fade-in {
-    opacity: 0;
-    transform: translateY(40px) scale(0.98);
-    transition:
-        opacity 0.9s ease-out,
-        transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
-    will-change: opacity, transform;
+/* ============================================================
+   AMT — "super advanced" design system
+   Brand: navy #080844 · orange #D6132B · electric glow accents
+   ============================================================ */
+:root, :root[data-theme="dark"] {
+  --bg: #060616;
+  --bg-2: #0a0a22;
+  --navy: #080844;
+  --navy-soft: #12123a;
+  --orange: #d6132b;
+  --orange-br: #f12942;
+  --ember: #ff8493;
+  --cyan: #5bd2ff;
+  --text: #f3f3f8;
+  --glass: rgba(255, 255, 255, 0.05);
+  --glass-2: rgba(255, 255, 255, 0.09);
+  --line: rgba(255, 255, 255, 0.1);
+  --line-2: rgba(255, 255, 255, 0.18);
+  --glow: rgba(214, 19, 43, 0.55);
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  /* semantic tokens (dark) */
+  --canvas: #060616;
+  --panel: #0a0a22;
+  --ink: #f3f3f8;
+  --copy: #c7c8da;
+  --muted: #a9abc4;
+  --eyebrow: #ff8493;
+  --hairline: rgba(255, 255, 255, 0.1);
+  --logo-filter: brightness(0) invert(1);
+  --atmo-noise: 0.035;
+  --text-grad: linear-gradient(110deg, #fff 0%, #ff8493 48%, #d6132b 100%);
+  --header-bg: rgba(8, 8, 22, 0.6);
+  --header-bg-solid: rgba(8, 8, 22, 0.96);
 }
 
-.fade-in.animate-in {
-    opacity: 1;
-    transform: translateY(0) scale(1);
+:root[data-theme="light"] {
+  --bg: #f4f5fb;
+  --bg-2: #ffffff;
+  --text: #0d1030;
+  --glass: rgba(255, 255, 255, 0.7);
+  --glass-2: rgba(255, 255, 255, 0.92);
+  --line: rgba(13, 16, 48, 0.1);
+  --line-2: rgba(13, 16, 48, 0.16);
+  --glow: rgba(214, 19, 43, 0.4);
+  /* semantic tokens (light) */
+  --canvas: #f4f5fb;
+  --panel: #ffffff;
+  --ink: #0d1030;
+  --copy: #3a3f5e;
+  --muted: #5e6486;
+  --eyebrow: #a50f22;
+  --hairline: rgba(13, 16, 48, 0.1);
+  --logo-filter: none;
+  --atmo-noise: 0.02;
+  --text-grad: linear-gradient(110deg, #0d1030 0%, #a50f22 55%, #d6132b 100%);
+  --header-bg: rgba(255, 255, 255, 0.72);
+  --header-bg-solid: rgba(255, 255, 255, 0.97);
+}
+
+html { scroll-behavior: smooth; }
+body {
+  background: var(--canvas);
+  color: var(--copy);
+  font-family: "Inter", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  transition: background-color 0.4s var(--ease), color 0.4s var(--ease);
+}
+
+/* theme-aware logo (header + footer use class .amt-logo) */
+.amt-logo { filter: var(--logo-filter); }
+html[dir="rtl"] body { font-family: "IBM Plex Sans Arabic", "Inter", sans-serif; }
+
+h1, h2, h3, .font-display { font-family: "Sora", "Inter", sans-serif; letter-spacing: -0.02em; }
+html[dir="rtl"] h1, html[dir="rtl"] h2, html[dir="rtl"] h3 { font-family: "IBM Plex Sans Arabic", "Sora", sans-serif; }
+
+::selection { background: var(--orange); color: #fff; }
+::-webkit-scrollbar { width: 11px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: #20204a; border-radius: 6px; border: 3px solid var(--bg); }
+::-webkit-scrollbar-thumb:hover { background: var(--orange); }
+
+/* ---- atmospheric background (fixed, behind everything) ---- */
+.amt-atmosphere {
+  position: fixed; inset: 0; z-index: -3; pointer-events: none;
+  background:
+    radial-gradient(60vw 60vw at 78% -8%, rgba(214, 19, 43, 0.18), transparent 60%),
+    radial-gradient(55vw 55vw at 5% 12%, rgba(43, 43, 130, 0.45), transparent 58%),
+    radial-gradient(50vw 50vw at 55% 108%, rgba(91, 210, 255, 0.1), transparent 60%),
+    var(--bg);
+  animation: amtDrift 26s var(--ease) infinite alternate;
+}
+.amt-atmosphere::before {
+  content: ""; position: absolute; inset: 0; opacity: 0.5;
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 64px 64px;
+  -webkit-mask-image: radial-gradient(circle at 50% 22%, #000 0%, transparent 72%);
+  mask-image: radial-gradient(circle at 50% 22%, #000 0%, transparent 72%);
+}
+:root[data-theme="light"] .amt-atmosphere {
+  background:
+    radial-gradient(60vw 60vw at 78% -8%, rgba(214, 19, 43, 0.12), transparent 60%),
+    radial-gradient(55vw 55vw at 5% 12%, rgba(43, 43, 130, 0.08), transparent 58%),
+    radial-gradient(50vw 50vw at 55% 108%, rgba(91, 210, 255, 0.08), transparent 60%),
+    var(--canvas);
+}
+.amt-atmosphere::after {
+  content: ""; position: absolute; inset: 0; opacity: var(--atmo-noise);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+@keyframes amtDrift { to { filter: hue-rotate(14deg) brightness(1.08); } }
+
+/* ---- utilities ---- */
+.text-gradient {
+  background: var(--text-grad);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.glass {
+  background: var(--glass);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(14px) saturate(140%);
+}
+.btn-glow {
+  background: linear-gradient(135deg, var(--orange-br), var(--orange));
+  box-shadow: 0 10px 34px -10px var(--glow), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+}
+.btn-glow:hover { transform: translateY(-2px); box-shadow: 0 16px 48px -12px var(--glow); }
+
+/* horizontal marquee (core-systems gallery) */
+@keyframes amt-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.amt-marquee { animation: amt-marquee 45s linear infinite; width: max-content; }
+.amt-marquee:hover { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) { .amt-marquee { animation: none; } }
+
+/* horizontal single-line card rows (solutions, testimonials) */
+.amt-row { scrollbar-width: thin; scrollbar-color: var(--line-2) transparent; scroll-padding-inline: 1rem; }
+.amt-row::-webkit-scrollbar { height: 8px; }
+.amt-row::-webkit-scrollbar-track { background: transparent; }
+.amt-row::-webkit-scrollbar-thumb { background: var(--line-2); border-radius: 4px; }
+.amt-row::-webkit-scrollbar-thumb:hover { background: var(--orange); }
+
+/* reveal on scroll */
+.reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.8s var(--ease), transform 0.8s var(--ease); }
+.reveal.animate-in, .reveal.in { opacity: 1; transform: none; }
+
+/* legacy fade kept for existing sections */
+.fade-in { opacity: 0; transform: translateY(40px) scale(0.98);
+  transition: opacity 0.9s ease-out, transform 0.9s cubic-bezier(0.22, 1, 0.36, 1); will-change: opacity, transform; }
+.fade-in.animate-in { opacity: 1; transform: translateY(0) scale(1); }
+
+@media (prefers-reduced-motion: reduce) {
+  .amt-atmosphere { animation: none; }
+  .reveal { opacity: 1; transform: none; }
 }

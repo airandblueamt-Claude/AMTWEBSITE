@@ -16,6 +16,7 @@ import { localize } from "../utils/localize";
 import { AppLocale, DEFAULT_LOCALE, isSupportedLocale, withLocale } from "../utils/localeRouting";
 
 /* ===== ICON MAP ===== */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const iconMap: Record<string, any> = {
   Server,
   Router,
@@ -27,6 +28,7 @@ const iconMap: Record<string, any> = {
 
 const SolutionDetails: React.FC = () => {
   const [active, setActive] = useState<number | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [data, setData] = useState<any>(null);
   const { i18n } = useTranslation();
   const { locale } = useParams();
@@ -63,34 +65,34 @@ const SolutionDetails: React.FC = () => {
   return (
     <section
       dir={lang === "ar" ? "rtl" : "ltr"}
-      className="relative min-h-screen bg-[#F5F6F8] px-6 md:px-20 py-24 text-[#292929] overflow-hidden"
+      className="relative min-h-screen py-20 md:py-28 overflow-hidden"
     >
-      {/* ===== ANIMATED BACKGROUND ===== */}
-      <motion.div
-        className="absolute -top-40 -left-40 w-[420px] h-[420px] bg-[#851A18]/20 rounded-full blur-[120px]"
-        animate={{ x: [0, 60, 0], y: [0, 40, 0] }}
-        transition={{ duration: 30, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute bottom-0 right-0 w-[360px] h-[360px] bg-[#851A18]/15 rounded-full blur-[120px]"
-        animate={{ x: [0, -50, 0], y: [0, -30, 0] }}
-        transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
-      />
-
       {/* ===== CONTENT ===== */}
-      <div className="relative z-10">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12">
         {/* HEADER */}
-        <div className="max-w-4xl mx-auto mb-20">
-          <h1 className="text-4xl md:text-5xl font-extrabold">
+        <header className="max-w-3xl mx-auto text-center mb-16 md:mb-20">
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gradient"
+          >
             {pageTitle}
-          </h1>
-          <p className="mt-6 text-gray-600 text-lg">
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="mt-6 text-sm sm:text-base md:text-lg text-muted"
+          >
             {pageDescription}
-          </p>
-        </div>
+          </motion.p>
+        </header>
 
         {/* CARDS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           {data.solutions.map((item: any, index: number) => {
             const Icon = iconMap[item.icon];
             const isActive = active === index;
@@ -101,45 +103,49 @@ const SolutionDetails: React.FC = () => {
               <motion.div
                 key={index}
                 layout
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.08 }}
                 onClick={() => setActive(isActive ? null : index)}
-                className={`relative cursor-pointer rounded-2xl bg-white border transition-all
+                className={`group glass relative cursor-pointer overflow-hidden rounded-2xl border transition-all duration-300 hover:-translate-y-1
                   ${isActive
-                    ? "border-[#851A18] shadow-lg"
-                    : "border-gray-200 hover:shadow-md"
+                    ? "border-[#d6132b]/60 shadow-[0_20px_50px_-20px_rgba(214,19,43,0.5)]"
+                    : "border-hairline hover:border-[#d6132b]/40 hover:shadow-[0_20px_50px_-20px_rgba(214,19,43,0.5)]"
                   }
                 `}
               >
                 {/* TOP LINE */}
                 <span
-                  className={`absolute top-0 left-0 h-1 w-full rounded-t-2xl
-                    ${isActive ? "bg-[#851A18]" : "bg-transparent"}
+                  className={`absolute top-0 left-0 h-1 w-full
+                    ${isActive ? "bg-[#d6132b]" : "bg-transparent"}
                   `}
                 />
 
                 {/* HEADER */}
                 <div className="p-8 flex items-start gap-4">
                   <div
-                    className={`p-2 rounded-lg ${isActive ? "bg-[#851A18]/10" : "bg-gray-100"
+                    className={`p-2 rounded-lg transition-colors ${isActive ? "bg-[#d6132b]/15" : "glass"
                       }`}
                   >
                     {Icon && (
                       <Icon
                         className={`w-7 h-7 ${isActive
-                            ? "text-[#851A18]"
-                            : "text-gray-400"
+                            ? "text-[#f12942]"
+                            : "text-muted"
                           }`}
                       />
                     )}
                   </div>
 
-                  <h3 className="text-lg font-semibold flex-1">
+                  <h3 className="text-lg font-semibold flex-1 text-ink">
                     {solutionTitle}
                   </h3>
 
                   <ChevronDown
                     className={`w-5 h-5 transition-transform ${isActive
-                        ? "rotate-180 text-[#851A18]"
-                        : "text-gray-400"
+                        ? "rotate-180 text-[#f12942]"
+                        : "text-muted"
                       }`}
                   />
                 </div>
@@ -154,17 +160,18 @@ const SolutionDetails: React.FC = () => {
                       transition={{ duration: 0.3 }}
                       className="px-8 pb-8"
                     >
-                      <ul className="space-y-3 pt-2 border-t border-gray-100">
+                      <ul className="space-y-3 pt-2 border-t border-hairline">
+                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                         {item.options?.map((opt: any, i: number) => {
                           const optionName = localize(opt.name, lang);
 
                           return (
                             <li key={i} className="flex items-center gap-2">
-                              <span className="w-2 h-2 rounded-full bg-[#851A18]" />
+                              <span className="w-2 h-2 rounded-full bg-[#d6132b]" />
                               <Link
                                 to={withLocale(opt.path, activeLocale)}
                                 onClick={(e) => e.stopPropagation()}
-                                className="text-sm text-gray-600 hover:text-[#851A18]"
+                                className="text-sm text-muted hover:text-[#f12942] transition-colors"
                               >
                                 {optionName}
                               </Link>
